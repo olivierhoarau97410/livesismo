@@ -83,7 +83,10 @@ header[data-testid="stHeader"] { display: none !important; }
         box-shadow: 2px 2px 8px rgba(0,0,0,0.3) !important;
     }
 }
-button[kind="header"] { display: none !important; }
+/* Sur desktop uniquement : masquer le bouton header (hamburger inutile) */
+@media (min-width: 768px) {
+    button[kind="header"] { display: none !important; }
+}
 [data-testid="stAppViewContainer"] > .main { padding-top: 0.5rem !important; }
 
 /* Badge source live */
