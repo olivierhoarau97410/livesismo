@@ -20,7 +20,7 @@ st.set_page_config(
     page_title="LIVESISMO — île de La Réunion",
     page_icon="🌋",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="auto",
 )
 
 # ── CSS personnalisé ─────────────────────────────────────────────────────────
@@ -69,28 +69,19 @@ hr { border-color: #e0e0e8; }
 [data-testid="stToolbar"] { display: none !important; }
 [data-testid="stDecoration"] { display: none !important; }
 header[data-testid="stHeader"] { display: none !important; }
-/* Desktop large : sidebar fixe, bouton collapse inutile → masqué */
+/* Desktop : sidebar toujours visible, bouton collapse masqué (évite accident) */
 @media (min-width: 768px) {
     [data-testid="stSidebarCollapseButton"] { display: none !important; }
     [data-testid="collapsedControl"]        { display: none !important; }
 }
-/* Mobile : bouton fermer sidebar visible dans la sidebar */
+/* Mobile : Streamlit gère nativement collapse/expand — on laisse faire */
+/* On met juste le bouton hamburger en rouge pour qu'il soit bien visible */
 @media (max-width: 767px) {
-    [data-testid="stSidebarCollapseButton"] {
-        display: flex !important;
-    }
-    /* Bouton hamburger pour rouvrir la sidebar : rouge bien visible */
     [data-testid="collapsedControl"] {
-        display: flex !important;
         background-color: #ef5350 !important;
         border-radius: 0 8px 8px 0 !important;
-        top: 1rem !important;
-        left: 0 !important;
-        width: 2.5rem !important;
-        height: 2.5rem !important;
-        box-shadow: 2px 2px 8px rgba(0,0,0,0.25) !important;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.3) !important;
     }
-    [data-testid="collapsedControl"] svg { color: white !important; fill: white !important; }
 }
 button[kind="header"] { display: none !important; }
 [data-testid="stAppViewContainer"] > .main { padding-top: 0.5rem !important; }
@@ -108,7 +99,8 @@ button[kind="header"] { display: none !important; }
 }
 </style>
 <script>
-// Sur desktop uniquement : forcer la sidebar ouverte en effaçant le localStorage
+// Desktop : forcer sidebar ouverte en effaçant localStorage
+// Mobile  : laisser Streamlit gérer (sidebar fermée par défaut sur petit écran)
 if (window.innerWidth >= 768) {
     Object.keys(localStorage).forEach(k => {
         if (k.includes('sidebar') || k.includes('Sidebar')) localStorage.removeItem(k);
