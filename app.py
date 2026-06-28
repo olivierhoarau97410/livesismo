@@ -69,8 +69,29 @@ hr { border-color: #e0e0e8; }
 [data-testid="stToolbar"] { display: none !important; }
 [data-testid="stDecoration"] { display: none !important; }
 header[data-testid="stHeader"] { display: none !important; }
-/* Masquer le bouton collapse sidebar (évite l'accident) */
-[data-testid="stSidebarCollapseButton"] { display: none !important; }
+/* Desktop large : sidebar fixe, bouton collapse inutile → masqué */
+@media (min-width: 768px) {
+    [data-testid="stSidebarCollapseButton"] { display: none !important; }
+    [data-testid="collapsedControl"]        { display: none !important; }
+}
+/* Mobile : bouton fermer sidebar visible dans la sidebar */
+@media (max-width: 767px) {
+    [data-testid="stSidebarCollapseButton"] {
+        display: flex !important;
+    }
+    /* Bouton hamburger pour rouvrir la sidebar : rouge bien visible */
+    [data-testid="collapsedControl"] {
+        display: flex !important;
+        background-color: #ef5350 !important;
+        border-radius: 0 8px 8px 0 !important;
+        top: 1rem !important;
+        left: 0 !important;
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.25) !important;
+    }
+    [data-testid="collapsedControl"] svg { color: white !important; fill: white !important; }
+}
 button[kind="header"] { display: none !important; }
 [data-testid="stAppViewContainer"] > .main { padding-top: 0.5rem !important; }
 
@@ -87,10 +108,12 @@ button[kind="header"] { display: none !important; }
 }
 </style>
 <script>
-// Efface le localStorage Streamlit pour forcer la sidebar ouverte
-Object.keys(localStorage).forEach(k => {
-    if (k.includes('sidebar') || k.includes('Sidebar')) localStorage.removeItem(k);
-});
+// Sur desktop uniquement : forcer la sidebar ouverte en effaçant le localStorage
+if (window.innerWidth >= 768) {
+    Object.keys(localStorage).forEach(k => {
+        if (k.includes('sidebar') || k.includes('Sidebar')) localStorage.removeItem(k);
+    });
+}
 </script>
 """, unsafe_allow_html=True)
 
