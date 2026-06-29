@@ -65,12 +65,21 @@ h1, h2, h3 { color: #1a1a2e; }
 /* Séparateur sidebar */
 hr { border-color: #e0e0e8; }
 
-/* Desktop uniquement : masquer header et bouton collapse (sidebar toujours visible) */
+/* Desktop : header propre, sidebar toujours ouverte */
 @media (min-width: 768px) {
     [data-testid="stToolbar"]               { display: none !important; }
     [data-testid="stDecoration"]            { display: none !important; }
     header[data-testid="stHeader"]          { display: none !important; }
+    /* Cacher le bouton fermer dans la sidebar */
     [data-testid="stSidebarCollapseButton"] { display: none !important; }
+    /* Forcer la sidebar ouverte même si localStorage dit "collapsed" */
+    [data-testid="stSidebar"][aria-expanded="false"] {
+        transform: none !important;
+        width: 21rem !important;
+        visibility: visible !important;
+    }
+    /* Cacher le bouton hamburger desktop (sidebar toujours là) */
+    [data-testid="collapsedControl"] { display: none !important; }
 }
 /* Mobile : on ne touche à RIEN — Streamlit gère nativement le hamburger */
 [data-testid="stAppViewContainer"] > .main { padding-top: 0.5rem !important; }
