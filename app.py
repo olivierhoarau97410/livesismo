@@ -74,14 +74,39 @@ hr { border-color: #e0e0e8; }
     [data-testid="collapsedControl"]        { display: none !important; }
     button[kind="header"]                   { display: none !important; }
 }
-/* Mobile : garder le header natif (contient le hamburger), juste nettoyer */
+/* Mobile : garder le header et forcer le bouton hamburger visible */
 @media (max-width: 767px) {
     [data-testid="stToolbar"]    { display: none !important; }
     [data-testid="stDecoration"] { display: none !important; }
-    /* Header visible pour avoir le bouton hamburger */
     header[data-testid="stHeader"] {
         background: transparent !important;
         box-shadow: none !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    /* Forcer visible tous les sélecteurs possibles du hamburger */
+    [data-testid="collapsedControl"],
+    [data-testid="stSidebarCollapseButton"],
+    button[kind="header"],
+    header[data-testid="stHeader"] button {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        position: fixed !important;
+        top: 8px !important;
+        left: 8px !important;
+        z-index: 9999 !important;
+        width: 44px !important;
+        height: 44px !important;
+        background: #ef5350 !important;
+        border-radius: 8px !important;
+        color: white !important;
+        border: none !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.35) !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 }
 [data-testid="stAppViewContainer"] > .main { padding-top: 0.5rem !important; }
