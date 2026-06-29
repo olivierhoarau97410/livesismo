@@ -75,8 +75,8 @@ hr { border-color: #e0e0e8; }
     /* Forcer la sidebar ouverte même si localStorage dit "collapsed" */
     [data-testid="stSidebar"][aria-expanded="false"] {
         transform: none !important;
-        width: 21rem !important;
         visibility: visible !important;
+        min-width: var(--sidebar-width, 244px) !important;
     }
     /* Cacher le bouton hamburger desktop (sidebar toujours là) */
     [data-testid="collapsedControl"] { display: none !important; }
