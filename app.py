@@ -106,65 +106,6 @@ from modules.carte2d import make_carte
 from modules.vue3d   import make_vue3d_html
 import streamlit.components.v1 as components
 
-# ── JS sidebar : desktop=forcé ouvert / mobile=bouton hamburger rouge ─────────
-components.html("""
-<script>
-(function() {
-    // Ce script tourne dans un iframe Streamlit — on cible le parent
-    const isMobile = window.parent.innerWidth < 768;
-    const doc = window.parent.document;
-
-    if (!isMobile) {
-        // Desktop : effacer localStorage pour garder sidebar ouverte
-        Object.keys(window.parent.localStorage).forEach(k => {
-            if (k.toLowerCase().includes('sidebar')) window.parent.localStorage.removeItem(k);
-        });
-        return;
-    }
-
-    // Mobile : injecter un bouton hamburger rouge dans le parent
-    function injectBtn() {
-        if (doc.getElementById('ls-hamburger')) return;
-        const btn = doc.createElement('button');
-        btn.id = 'ls-hamburger';
-        btn.textContent = '☰';
-        Object.assign(btn.style, {
-            position:'fixed', top:'8px', left:'8px', zIndex:'2147483647',
-            width:'44px', height:'44px', background:'#ef5350', color:'white',
-            border:'none', borderRadius:'8px', fontSize:'24px', cursor:'pointer',
-            boxShadow:'0 2px 10px rgba(0,0,0,0.4)', lineHeight:'1',
-        });
-        btn.onclick = function() {
-            // Cherche le bouton natif Streamlit (plusieurs sélecteurs possibles)
-            const sels = [
-                '[data-testid="collapsedControl"]',
-                '[data-testid="stSidebarCollapseButton"]',
-                'button[kind="header"]',
-            ];
-            for (const s of sels) {
-                const el = doc.querySelector(s);
-                if (el) { el.click(); return; }
-            }
-        };
-        doc.body.appendChild(btn);
-
-        // Cacher quand sidebar visible, montrer quand fermée
-        new MutationObserver(() => {
-            const sb = doc.querySelector('[data-testid="stSidebar"]');
-            if (!sb) return;
-            const visible = sb.getBoundingClientRect().left > -10;
-            btn.style.display = visible ? 'none' : 'flex';
-            btn.style.alignItems = 'center';
-            btn.style.justifyContent = 'center';
-        }).observe(doc.body, {childList:true, subtree:true, attributes:true});
-    }
-
-    // Attendre que Streamlit ait fini de charger
-    setTimeout(injectBtn, 1200);
-    setTimeout(injectBtn, 3000); // second essai si chargement lent
-})();
-</script>
-""", height=0)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  SIDEBAR — Filtres & contrôles
