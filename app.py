@@ -102,13 +102,81 @@ header[data-testid="stHeader"] { display: none !important; }
 }
 </style>
 <script>
-// Desktop : forcer sidebar ouverte en effaçant localStorage
-// Mobile  : laisser Streamlit gérer (sidebar fermée par défaut sur petit écran)
-if (window.innerWidth >= 768) {
-    Object.keys(localStorage).forEach(k => {
-        if (k.includes('sidebar') || k.includes('Sidebar')) localStorage.removeItem(k);
-    });
-}
+(function() {
+    const isMobile = window.innerWidth < 768;
+
+    if (!isMobile) {
+        // Desktop : forcer sidebar ouverte
+        Object.keys(localStorage).forEach(k => {
+            if (k.includes('sidebar') || k.includes('Sidebar')) localStorage.removeItem(k);
+        });
+        return;
+    }
+
+    // Mobile : injecter un bouton hamburger flottant fiable
+    function injectHamburger() {
+        if (document.getElementById('livesismo-hamburger')) return;
+        const btn = document.createElement('button');
+        btn.id = 'livesismo-hamburger';
+        btn.innerHTML = '&#9776;';
+        btn.title = 'Ouvrir le menu';
+        Object.assign(btn.style, {
+            position: 'fixed',
+            top: '10px',
+            left: '10px',
+            zIndex: '999999',
+            width: '42px',
+            height: '42px',
+            background: '#ef5350',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '22px',
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            lineHeight: '1',
+        });
+        btn.onclick = function() {
+            // Essaie tous les sélecteurs connus pour le bouton collapse Streamlit
+            const selectors = [
+                '[data-testid="collapsedControl"]',
+                '[data-testid="stSidebarCollapseButton"]',
+                'button[kind="header"]',
+                'section[data-testid="stSidebar"] ~ div button',
+            ];
+            for (const sel of selectors) {
+                const el = document.querySelector(sel);
+                if (el) { el.click(); return; }
+            }
+            // Fallback : chercher n'importe quel bouton proche du bord gauche
+            document.querySelectorAll('button').forEach(b => {
+                const r = b.getBoundingClientRect();
+                if (r.left < 60 && r.top < 100) b.click();
+            });
+        };
+        document.body.appendChild(btn);
+
+        // Masquer le bouton quand la sidebar est ouverte
+        const observer = new MutationObserver(() => {
+            const sidebar = document.querySelector('[data-testid="stSidebar"]');
+            if (sidebar) {
+                const open = sidebar.getBoundingClientRect().left >= 0;
+                btn.style.display = open ? 'none' : 'flex';
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    }
+
+    // Attendre que le DOM soit prêt
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', injectHamburger);
+    } else {
+        setTimeout(injectHamburger, 800);
+    }
+})();
 </script>
 """, unsafe_allow_html=True)
 
