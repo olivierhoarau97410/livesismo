@@ -20,7 +20,7 @@ st.set_page_config(
     page_title="LIVESISMO — île de La Réunion",
     page_icon="🌋",
     layout="wide",
-    initial_sidebar_state="auto",
+    initial_sidebar_state="expanded",
 )
 
 # ── CSS personnalisé ─────────────────────────────────────────────────────────
@@ -65,50 +65,14 @@ h1, h2, h3 { color: #1a1a2e; }
 /* Séparateur sidebar */
 hr { border-color: #e0e0e8; }
 
-/* Desktop : masquer toolbar, décoration, header et boutons inutiles */
+/* Desktop uniquement : masquer header et bouton collapse (sidebar toujours visible) */
 @media (min-width: 768px) {
     [data-testid="stToolbar"]               { display: none !important; }
     [data-testid="stDecoration"]            { display: none !important; }
     header[data-testid="stHeader"]          { display: none !important; }
     [data-testid="stSidebarCollapseButton"] { display: none !important; }
-    [data-testid="collapsedControl"]        { display: none !important; }
-    button[kind="header"]                   { display: none !important; }
 }
-/* Mobile : garder le header et forcer le bouton hamburger visible */
-@media (max-width: 767px) {
-    [data-testid="stToolbar"]    { display: none !important; }
-    [data-testid="stDecoration"] { display: none !important; }
-    header[data-testid="stHeader"] {
-        background: transparent !important;
-        box-shadow: none !important;
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-    /* Forcer visible tous les sélecteurs possibles du hamburger */
-    [data-testid="collapsedControl"],
-    [data-testid="stSidebarCollapseButton"],
-    button[kind="header"],
-    header[data-testid="stHeader"] button {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
-        position: fixed !important;
-        top: 8px !important;
-        left: 8px !important;
-        z-index: 9999 !important;
-        width: 44px !important;
-        height: 44px !important;
-        background: #ef5350 !important;
-        border-radius: 8px !important;
-        color: white !important;
-        border: none !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.35) !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-}
+/* Mobile : on ne touche à RIEN — Streamlit gère nativement le hamburger */
 [data-testid="stAppViewContainer"] > .main { padding-top: 0.5rem !important; }
 
 /* Badge source live */
