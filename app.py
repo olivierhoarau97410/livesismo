@@ -101,83 +101,6 @@ header[data-testid="stHeader"] { display: none !important; }
     margin-left:6px; vertical-align:middle;
 }
 </style>
-<script>
-(function() {
-    const isMobile = window.innerWidth < 768;
-
-    if (!isMobile) {
-        // Desktop : forcer sidebar ouverte
-        Object.keys(localStorage).forEach(k => {
-            if (k.includes('sidebar') || k.includes('Sidebar')) localStorage.removeItem(k);
-        });
-        return;
-    }
-
-    // Mobile : injecter un bouton hamburger flottant fiable
-    function injectHamburger() {
-        if (document.getElementById('livesismo-hamburger')) return;
-        const btn = document.createElement('button');
-        btn.id = 'livesismo-hamburger';
-        btn.innerHTML = '&#9776;';
-        btn.title = 'Ouvrir le menu';
-        Object.assign(btn.style, {
-            position: 'fixed',
-            top: '10px',
-            left: '10px',
-            zIndex: '999999',
-            width: '42px',
-            height: '42px',
-            background: '#ef5350',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            fontSize: '22px',
-            cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            lineHeight: '1',
-        });
-        btn.onclick = function() {
-            // Essaie tous les sélecteurs connus pour le bouton collapse Streamlit
-            const selectors = [
-                '[data-testid="collapsedControl"]',
-                '[data-testid="stSidebarCollapseButton"]',
-                'button[kind="header"]',
-                'section[data-testid="stSidebar"] ~ div button',
-            ];
-            for (const sel of selectors) {
-                const el = document.querySelector(sel);
-                if (el) { el.click(); return; }
-            }
-            // Fallback : chercher n'importe quel bouton proche du bord gauche
-            document.querySelectorAll('button').forEach(b => {
-                const r = b.getBoundingClientRect();
-                if (r.left < 60 && r.top < 100) b.click();
-            });
-        };
-        document.body.appendChild(btn);
-
-        // Masquer le bouton quand la sidebar est ouverte
-        const observer = new MutationObserver(() => {
-            const sidebar = document.querySelector('[data-testid="stSidebar"]');
-            if (sidebar) {
-                const open = sidebar.getBoundingClientRect().left >= 0;
-                btn.style.display = open ? 'none' : 'flex';
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
-    }
-
-    // Attendre que le DOM soit prêt
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', injectHamburger);
-    } else {
-        setTimeout(injectHamburger, 800);
-    }
-})();
-</script>
 """, unsafe_allow_html=True)
 
 # ── Imports modules internes ──────────────────────────────────────────────────
@@ -185,6 +108,66 @@ from modules.fetch   import get_all_events, apply_filters, load_historique, fetc
 from modules.carte2d import make_carte
 from modules.vue3d   import make_vue3d_html
 import streamlit.components.v1 as components
+
+# ── JS sidebar : desktop=forcé ouvert / mobile=bouton hamburger rouge ─────────
+components.html("""
+<script>
+(function() {
+    // Ce script tourne dans un iframe Streamlit — on cible le parent
+    const isMobile = window.parent.innerWidth < 768;
+    const doc = window.parent.document;
+
+    if (!isMobile) {
+        // Desktop : effacer localStorage pour garder sidebar ouverte
+        Object.keys(window.parent.localStorage).forEach(k => {
+            if (k.toLowerCase().includes('sidebar')) window.parent.localStorage.removeItem(k);
+        });
+        return;
+    }
+
+    // Mobile : injecter un bouton hamburger rouge dans le parent
+    function injectBtn() {
+        if (doc.getElementById('ls-hamburger')) return;
+        const btn = doc.createElement('button');
+        btn.id = 'ls-hamburger';
+        btn.textContent = '☰';
+        Object.assign(btn.style, {
+            position:'fixed', top:'8px', left:'8px', zIndex:'2147483647',
+            width:'44px', height:'44px', background:'#ef5350', color:'white',
+            border:'none', borderRadius:'8px', fontSize:'24px', cursor:'pointer',
+            boxShadow:'0 2px 10px rgba(0,0,0,0.4)', lineHeight:'1',
+        });
+        btn.onclick = function() {
+            // Cherche le bouton natif Streamlit (plusieurs sélecteurs possibles)
+            const sels = [
+                '[data-testid="collapsedControl"]',
+                '[data-testid="stSidebarCollapseButton"]',
+                'button[kind="header"]',
+            ];
+            for (const s of sels) {
+                const el = doc.querySelector(s);
+                if (el) { el.click(); return; }
+            }
+        };
+        doc.body.appendChild(btn);
+
+        // Cacher quand sidebar visible, montrer quand fermée
+        new MutationObserver(() => {
+            const sb = doc.querySelector('[data-testid="stSidebar"]');
+            if (!sb) return;
+            const visible = sb.getBoundingClientRect().left > -10;
+            btn.style.display = visible ? 'none' : 'flex';
+            btn.style.alignItems = 'center';
+            btn.style.justifyContent = 'center';
+        }).observe(doc.body, {childList:true, subtree:true, attributes:true});
+    }
+
+    // Attendre que Streamlit ait fini de charger
+    setTimeout(injectBtn, 1200);
+    setTimeout(injectBtn, 3000); // second essai si chargement lent
+})();
+</script>
+""", height=0)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  SIDEBAR — Filtres & contrôles
