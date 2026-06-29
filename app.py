@@ -65,27 +65,24 @@ h1, h2, h3 { color: #1a1a2e; }
 /* Séparateur sidebar */
 hr { border-color: #e0e0e8; }
 
-/* Masquer toolbar, décoration et header Streamlit */
-[data-testid="stToolbar"] { display: none !important; }
-[data-testid="stDecoration"] { display: none !important; }
-header[data-testid="stHeader"] { display: none !important; }
-/* Desktop : sidebar toujours visible, bouton collapse masqué (évite accident) */
+/* Desktop : masquer toolbar, décoration, header et boutons inutiles */
 @media (min-width: 768px) {
+    [data-testid="stToolbar"]               { display: none !important; }
+    [data-testid="stDecoration"]            { display: none !important; }
+    header[data-testid="stHeader"]          { display: none !important; }
     [data-testid="stSidebarCollapseButton"] { display: none !important; }
     [data-testid="collapsedControl"]        { display: none !important; }
+    button[kind="header"]                   { display: none !important; }
 }
-/* Mobile : Streamlit gère nativement collapse/expand — on laisse faire */
-/* On met juste le bouton hamburger en rouge pour qu'il soit bien visible */
+/* Mobile : garder le header natif (contient le hamburger), juste nettoyer */
 @media (max-width: 767px) {
-    [data-testid="collapsedControl"] {
-        background-color: #ef5350 !important;
-        border-radius: 0 8px 8px 0 !important;
-        box-shadow: 2px 2px 8px rgba(0,0,0,0.3) !important;
+    [data-testid="stToolbar"]    { display: none !important; }
+    [data-testid="stDecoration"] { display: none !important; }
+    /* Header visible pour avoir le bouton hamburger */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+        box-shadow: none !important;
     }
-}
-/* Sur desktop uniquement : masquer le bouton header (hamburger inutile) */
-@media (min-width: 768px) {
-    button[kind="header"] { display: none !important; }
 }
 [data-testid="stAppViewContainer"] > .main { padding-top: 0.5rem !important; }
 
